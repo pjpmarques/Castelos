@@ -228,6 +228,11 @@ struct MapView: UIViewRepresentable {
                     for: castleAnnotation
                 ) as! CastleAnnotationView
                 
+                // Ensure the marker is properly configured
+                // This will help maintain the correct appearance during zoom
+                annotationView.glyphImage = UIImage(systemName: "building.columns.fill")
+                annotationView.markerTintColor = castleAnnotation.castle.isVisited ? .systemGreen : .systemBrown
+                
                 return annotationView
             }
             

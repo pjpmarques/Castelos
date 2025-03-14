@@ -68,7 +68,7 @@ class CastleAnnotationView: MKMarkerAnnotationView {
      * - Callout display
      */
     private func setupMarker() {
-        glyphImage = UIImage(systemName: "castle.turret.fill")
+        glyphImage = UIImage(systemName: "building.columns.fill")
         markerTintColor = .systemBrown
         
         if let castleAnnotation = annotation as? CastleAnnotation {
@@ -98,6 +98,9 @@ class CastleAnnotationView: MKMarkerAnnotationView {
      */
     override func prepareForDisplay() {
         super.prepareForDisplay()
+        
+        // Always ensure the correct icon is used, even during zoom operations
+        glyphImage = UIImage(systemName: "building.columns.fill")
         
         if let castleAnnotation = annotation as? CastleAnnotation {
             markerTintColor = castleAnnotation.castle.isVisited ? .systemGreen : .systemBrown

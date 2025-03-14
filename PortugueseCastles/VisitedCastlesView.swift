@@ -41,7 +41,7 @@ struct VisitedCastlesView: View {
                         }) {
                             HStack {
                                 // Castle icon
-                                Image(systemName: "castle.turret.fill")
+                                Image(systemName: "building.columns.fill")
                                     .foregroundColor(.green)
                                 
                                 // Castle name
