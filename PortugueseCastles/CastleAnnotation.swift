@@ -39,6 +39,7 @@ class CastleAnnotation: NSObject, MKAnnotation {
  * This custom annotation view:
  * - Uses a castle turret icon as the marker glyph
  * - Changes color based on visited status (brown for unvisited, green for visited)
+ * - Provides a car button for directions to the castle
  * - Provides an information button to access Wikipedia details
  * - Supports callouts when tapped
  */
@@ -62,7 +63,9 @@ class CastleAnnotationView: MKMarkerAnnotationView {
      * Sets up:
      * - The castle turret icon as the marker glyph
      * - Color based on visit status
-     * - Callout display and accessory view (info button)
+     * - Left accessory view (car button for directions)
+     * - Right accessory view (info button for Wikipedia)
+     * - Callout display
      */
     private func setupMarker() {
         glyphImage = UIImage(systemName: "castle.turret.fill")
@@ -76,6 +79,12 @@ class CastleAnnotationView: MKMarkerAnnotationView {
         
         canShowCallout = true
         
+        // Create directions button with car icon (left accessory)
+        let directionsButton = UIButton(type: .detailDisclosure)
+        directionsButton.setImage(UIImage(systemName: "car.fill"), for: .normal)
+        leftCalloutAccessoryView = directionsButton
+        
+        // Create info button (right accessory)
         let infoButton = UIButton(type: .detailDisclosure)
         infoButton.setImage(UIImage(systemName: "info.circle"), for: .normal)
         rightCalloutAccessoryView = infoButton

@@ -289,14 +289,38 @@ struct MapView: UIViewRepresentable {
         }
         
         /**
-         * Handles taps on a castle's info button in the callout
+         * Handles taps on a castle's callout accessory buttons
          *
-         * Shows the Wikipedia info sheet for the castle.
+         * Determines which button was tapped and responds accordingly:
+         * - Left button (car): Opens Apple Maps with directions to the castle
+         * - Right button (info): Shows the Wikipedia info sheet for the castle
          */
         func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
             guard let castleAnnotation = view.annotation as? CastleAnnotation else { return }
             parent.selectedCastle = castleAnnotation.castle
-            parent.showInfoSheet = true
+            
+            // Check which accessory was tapped
+            if control == view.leftCalloutAccessoryView {
+                // Car button - open Maps app with driving directions
+                let castle = castleAnnotation.castle
+                
+                // Create a Maps URL for directions
+                let latitude = castle.coordinate.latitude
+                let longitude = castle.coordinate.longitude
+                let name = castle.name.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+                
+                // Format: maps://?daddr=lat,long&dirflg=d
+                // dirflg=d means driving directions
+                let urlString = "maps://?daddr=\(latitude),\(longitude)&dirflg=d&dname=\(name)"
+                
+                if let url = URL(string: urlString) {
+                    // Use the modern, non-deprecated API
+                    UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                }
+            } else if control == view.rightCalloutAccessoryView {
+                // Info button - show Wikipedia sheet
+                parent.showInfoSheet = true
+            }
         }
         
         /**
