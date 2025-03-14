@@ -44,8 +44,9 @@ struct ContentView: View {
     private let maxInitialSearchResults = 15
     
     // Portugal's bounding box coordinates for resetting the map
+    // Adjusted to shift center point slightly southward for better viewing
     private let portugalRegion = MKCoordinateRegion(
-        center: CLLocationCoordinate2D(latitude: 39.5, longitude: -8.0),
+        center: CLLocationCoordinate2D(latitude: 40.0, longitude: -8.0),
         span: MKCoordinateSpan(latitudeDelta: 5.0, longitudeDelta: 5.0)
     )
     
