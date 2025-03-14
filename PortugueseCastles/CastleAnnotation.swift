@@ -69,6 +69,20 @@ class CastleAnnotationView: MKMarkerAnnotationView {
      */
     private func setupMarker() {
         glyphImage = UIImage(systemName: "building.columns.fill")
+        
+        // Ensure the marker animates when added to the map for better visibility
+        animatesWhenAdded = true
+        
+        // Set a display priority that ensures the marker stays visible
+        // but doesn't force all markers to be displayed at once
+        displayPriority = .defaultHigh
+        
+        // Make sure the marker remains visible when selected
+        isHidden = false
+        
+        // Show title only in callout, not on the marker itself
+        titleVisibility = .visible
+        
         markerTintColor = .systemBrown
         
         if let castleAnnotation = annotation as? CastleAnnotation {
@@ -104,6 +118,26 @@ class CastleAnnotationView: MKMarkerAnnotationView {
         
         if let castleAnnotation = annotation as? CastleAnnotation {
             markerTintColor = castleAnnotation.castle.isVisited ? .systemGreen : .systemBrown
+        }
+    }
+    
+    /**
+     * Ensures the marker remains visible when selected
+     */
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+        
+        // Make sure the glyphImage is set again when the annotation is selected
+        glyphImage = UIImage(systemName: "building.columns.fill")
+        
+        // Ensure the marker isn't hidden
+        isHidden = false
+        
+        // When selected, make sure this annotation has high priority for display
+        if selected {
+            displayPriority = .required
+        } else {
+            displayPriority = .defaultHigh
         }
     }
 } 
