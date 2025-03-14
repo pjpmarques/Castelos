@@ -1,11 +1,33 @@
+/**
+ * ContentView.swift
+ * 
+ * Main view of the Portuguese Castles app.
+ * Coordinates all UI components and user interactions.
+ */
 import SwiftUI
 import MapKit
 import CoreLocation
 
+/**
+ * ContentView - Main view controller for the app
+ * 
+ * This view:
+ * - Integrates all app components (map, search, controls)
+ * - Manages the overall app state
+ * - Handles user interactions
+ * - Coordinates between views
+ */
 struct ContentView: View {
+    // MARK: - State Management
+    
+    // Core data service for castle information
     @StateObject private var dataService = CastleDataService()
+    
+    // Castle selection state
     @State private var selectedCastle: Castle?
     @State private var showInfoSheet = false
+    
+    // UI state management
     @State private var showVisitedCastles = false
     @State private var searchText = ""
     @State private var isSearching = false
@@ -13,6 +35,8 @@ struct ContentView: View {
     @State private var shouldResetMapView = false
     @State private var showFallbackSafari = false
     @State private var webViewErrorOccurred = false
+    
+    // Location related state
     @State private var centerOnUserLocation = false
     @State private var locationManager = CLLocationManager()
     
@@ -25,16 +49,26 @@ struct ContentView: View {
         span: MKCoordinateSpan(latitudeDelta: 5.0, longitudeDelta: 5.0)
     )
     
-    // Function to calculate dynamic height based on number of results
+    /**
+     * Calculates the appropriate height for search results based on the number of results
+     * 
+     * Limits the height to prevent excessive space usage for large result sets,
+     * and uses a different limit for initial (empty query) vs. search results.
+     */
     private func calculateSearchResultsHeight() -> CGFloat {
         let resultsCount = dataService.searchCastles(query: searchText).count
         let limitedResultsCount = searchText.isEmpty ? min(resultsCount, maxInitialSearchResults) : min(resultsCount, 10)
         return min(300, CGFloat(limitedResultsCount * 44))
     }
     
+    // MARK: - View Body
+    
     var body: some View {
+        // Main ZStack layout for layering UI elements
         ZStack(alignment: .top) {
-            // Map View
+            // MARK: Map Layer
+            
+            // Map View - The base layer showing all castles
             MapView(dataService: dataService, 
                    selectedCastle: $selectedCastle, 
                    showInfoSheet: $showInfoSheet,
@@ -44,7 +78,9 @@ struct ContentView: View {
                 .edgesIgnoringSafeArea(.all)
                 .overlay(
                     VStack {
-                        // Map Type Picker
+                        // MARK: Top Controls Layer
+                        
+                        // Map Type Picker - Allows switching between map views
                         Picker("Map Type", selection: $mapType) {
                             Text("Standard").tag(MKMapType.standard)
                             Text("Satellite").tag(MKMapType.satellite)
@@ -56,14 +92,14 @@ struct ContentView: View {
                         .padding(.bottom, 2)
                         .background(Color(.systemBackground).opacity(0.8))
                         
-                        // Search Bar
+                        // Search Bar - For finding castles
                         SearchBar(searchText: $searchText, isSearching: $isSearching)
                             .padding(.top, 2)
                         
                         // Display search results without animation
                         Group {
                             if isSearching {
-                                // Search Results
+                                // Search Results - Shows matching castles
                                 SearchResultsView(
                                     dataService: dataService,
                                     searchText: $searchText,
@@ -81,6 +117,8 @@ struct ContentView: View {
                     }
                 )
             
+            // MARK: Castle Selection Controls Layer
+            
             // Bottom Controls when a castle is selected
             if let selectedCastle = selectedCastle {
                 VStack {
@@ -89,7 +127,7 @@ struct ContentView: View {
                     HStack {
                         Spacer()
                         
-                        // Visit/Unvisit Button - Now centered since Info button is removed
+                        // Visit/Unvisit Button - Allows marking castles as visited
                         Button(action: {
                             dataService.toggleVisitedStatus(for: selectedCastle)
                             // Just clear the selected castle, don't reset the map view
@@ -113,7 +151,9 @@ struct ContentView: View {
                 }
             }
             
-            // Bottom right buttons
+            // MARK: Floating Controls Layer
+            
+            // Bottom right buttons for map actions
             VStack {
                 Spacer()
                 
@@ -121,7 +161,7 @@ struct ContentView: View {
                     Spacer()
                     
                     VStack(spacing: 16) {
-                        // Location Button
+                        // Location Button - Centers map on user location
                         Button(action: {
                             // Request location authorization if not determined
                             if locationManager.authorizationStatus == .notDetermined {
@@ -140,7 +180,7 @@ struct ContentView: View {
                                 .shadow(radius: 3)
                         }
                         
-                        // Visited Castles Button
+                        // Visited Castles Button - Shows list of visited castles
                         Button(action: {
                             showVisitedCastles = true
                         }) {
@@ -158,6 +198,9 @@ struct ContentView: View {
                 }
             }
         }
+        // MARK: Modal Sheets
+        
+        // Castle Information Sheet - Shows Wikipedia information
         .sheet(isPresented: $showInfoSheet) {
             if let selectedCastle = selectedCastle, 
                let wikipediaURL = selectedCastle.wikipediaLink {
@@ -201,9 +244,14 @@ struct ContentView: View {
                 .padding()
             }
         }
+        
+        // Visited Castles Sheet - Shows list of visited castles
         .sheet(isPresented: $showVisitedCastles) {
             VisitedCastlesView(dataService: dataService, selectedCastle: $selectedCastle)
         }
+        
+        // MARK: Lifecycle Events
+        
         .onAppear {
             // Set the map type
             NotificationCenter.default.post(

@@ -1,6 +1,22 @@
+/**
+ * MapView.swift
+ * 
+ * Core map component that displays castles on an interactive map.
+ * Handles map display, interactions, annotations, and zoom behaviors.
+ */
 import SwiftUI
 import MapKit
 
+/**
+ * MapView - Interactive map displaying Portuguese castles
+ *
+ * This SwiftUI wrapper around MKMapView handles:
+ * - Displaying castle annotations on the map
+ * - Handling user interactions (taps, selections)
+ * - Managing zoom levels and map regions
+ * - Preserving zoom state when deselecting castles
+ * - Supporting user location tracking
+ */
 struct MapView: UIViewRepresentable {
     @ObservedObject var dataService: CastleDataService
     @Binding var selectedCastle: Castle?
@@ -9,6 +25,16 @@ struct MapView: UIViewRepresentable {
     @Binding var centerOnUserLocation: Bool
     let portugalRegion: MKCoordinateRegion
     
+    /**
+     * Creates the underlying MKMapView instance
+     *
+     * Sets up the initial map configuration including:
+     * - Map region (initially showing all of Portugal)
+     * - Map delegate for handling interactions
+     * - User location display
+     * - Custom castle annotation views
+     * - Touch handling
+     */
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView()
         mapView.delegate = context.coordinator
@@ -39,6 +65,18 @@ struct MapView: UIViewRepresentable {
         return mapView
     }
     
+    /**
+     * Updates the map view when bound variables change
+     *
+     * Handles several different update scenarios:
+     * 1. Map reset - Returns to the full Portugal view
+     * 2. User location centering - Focuses on user's current location
+     * 3. Castle selection - Zooms to selected castle and shows its annotation
+     * 4. Castle deselection - Returns to previous map region before selection
+     *
+     * Smart zoom behavior ensures the map maintains appropriate zoom levels
+     * when interacting with castles.
+     */
     func updateUIView(_ mapView: MKMapView, context: Context) {
         updateAnnotations(mapView: mapView)
         
@@ -118,6 +156,16 @@ struct MapView: UIViewRepresentable {
         }
     }
     
+    /**
+     * Updates the castle annotations displayed on the map
+     *
+     * This method:
+     * - Removes existing castle annotations
+     * - Creates new annotations from the current castle data
+     * - Adds them to the map
+     *
+     * This ensures the map always shows the current state of castle data.
+     */
     private func updateAnnotations(mapView: MKMapView) {
         // Remove existing annotations
         let existingAnnotations = mapView.annotations.compactMap { $0 as? CastleAnnotation }
@@ -128,15 +176,32 @@ struct MapView: UIViewRepresentable {
         mapView.addAnnotations(annotations)
     }
     
+    /**
+     * Creates the coordinator that bridges UIKit and SwiftUI
+     *
+     * The coordinator handles map delegate methods and user interactions.
+     */
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
     
+    /**
+     * Coordinator class - Handles map delegate methods and user interactions
+     *
+     * This class is responsible for:
+     * - Responding to map interactions (taps, selection)
+     * - Managing annotation views
+     * - Tracking state for smart zoom behavior
+     * - Handling map type changes
+     */
     class Coordinator: NSObject, MKMapViewDelegate, UIGestureRecognizerDelegate {
         var parent: MapView
         weak var mapView: MKMapView?
+        
+        // Smart zoom tracking properties
         var previousMapRegion: MKCoordinateRegion?
         var previousSelectedCastle: Castle?
+        
         // Flag to prevent selection loops
         var isHandlingSelection = false
         
@@ -144,6 +209,12 @@ struct MapView: UIViewRepresentable {
             self.parent = parent
         }
         
+        /**
+         * Creates annotation views for castles
+         *
+         * Returns a custom CastleAnnotationView for castle annotations,
+         * or nil for the user location annotation (to use default blue dot).
+         */
         func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
             self.mapView = mapView
             
@@ -163,6 +234,14 @@ struct MapView: UIViewRepresentable {
             return nil
         }
         
+        /**
+         * Handles castle annotation selection
+         *
+         * When a castle marker is tapped:
+         * - Prevents selection loops with isHandlingSelection flag
+         * - Stores the current map region for smart zoom behavior
+         * - Updates the selected castle in the parent view
+         */
         func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
             guard !isHandlingSelection, let castleAnnotation = view.annotation as? CastleAnnotation else { return }
             
@@ -183,6 +262,14 @@ struct MapView: UIViewRepresentable {
             }
         }
         
+        /**
+         * Handles castle annotation deselection
+         *
+         * When a castle marker is deselected:
+         * - Prevents deselection loops with isHandlingSelection flag
+         * - Clears the selected castle in the parent view
+         * - The map will restore previous region in updateUIView
+         */
         func mapView(_ mapView: MKMapView, didDeselect view: MKAnnotationView) {
             // Only process deselection if we're not in the middle of handling a selection
             guard !isHandlingSelection else { return }
@@ -201,12 +288,22 @@ struct MapView: UIViewRepresentable {
             }
         }
         
+        /**
+         * Handles taps on a castle's info button in the callout
+         *
+         * Shows the Wikipedia info sheet for the castle.
+         */
         func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
             guard let castleAnnotation = view.annotation as? CastleAnnotation else { return }
             parent.selectedCastle = castleAnnotation.castle
             parent.showInfoSheet = true
         }
         
+        /**
+         * Handles map type changes (Standard, Satellite, Hybrid)
+         *
+         * Receives notifications from ContentView when the user changes map type.
+         */
         @objc func mapTypeChanged(_ notification: Notification) {
             guard let userInfo = notification.userInfo,
                   let mapTypeRawValue = userInfo["mapType"] as? UInt,
@@ -218,6 +315,14 @@ struct MapView: UIViewRepresentable {
             mapView?.mapType = mapType
         }
         
+        /**
+         * Handles taps on the map (outside of annotations)
+         *
+         * When tapping on an empty area of the map:
+         * - Checks if the tap is outside of any annotation
+         * - If so and a castle is selected, deselects it
+         * - Prevents tap handling loops with isHandlingSelection flag
+         */
         @objc func handleMapTap(_ gestureRecognizer: UITapGestureRecognizer) {
             if gestureRecognizer.state == .ended {
                 // Don't process if we're in the middle of a selection/deselection 
@@ -251,7 +356,12 @@ struct MapView: UIViewRepresentable {
             }
         }
         
-        // Implement UIGestureRecognizerDelegate to allow both tap gesture and annotation selection
+        /**
+         * Controls whether a gesture recognizer should receive a touch
+         *
+         * Prevents the tap gesture from capturing taps on annotation views,
+         * allowing those to be handled by the map's annotation selection instead.
+         */
         func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
             // Allow the gesture to be recognized only if the touch is not on an annotation view
             if let mapView = gestureRecognizer.view as? MKMapView {
