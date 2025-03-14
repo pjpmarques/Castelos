@@ -21,7 +21,9 @@
     <key>LSRequiresIPhoneOS</key>
     <true/>
     <key>NSLocationWhenInUseUsageDescription</key>
-    <string>We need your location to show your position relative to castles on the map.</string>
+    <string>Your location is used to show your position on the map relative to castles.</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>Your location is used to show your position on the map relative to castles.</string>
     <key>UIApplicationSceneManifest</key>
     <dict>
         <key>UIApplicationSupportsMultipleScenes</key>

@@ -16,9 +16,7 @@ struct SearchBar: View {
                     .disableAutocorrection(true)
                     .frame(minHeight: 36)
                     .onTapGesture {
-                        withAnimation {
-                            isSearching = true
-                        }
+                        isSearching = true
                     }
                 
                 if !searchText.isEmpty {
@@ -37,9 +35,7 @@ struct SearchBar: View {
             .background(Color(.systemGray6))
             .cornerRadius(10)
             .onTapGesture {
-                withAnimation {
-                    isSearching = true
-                }
+                isSearching = true
             }
             
             if isSearching {
@@ -61,9 +57,7 @@ struct SearchBar: View {
         .onAppear {
             // This allows us to detect when the search field is focused
             NotificationCenter.default.addObserver(forName: UITextField.textDidBeginEditingNotification, object: nil, queue: .main) { _ in
-                withAnimation {
-                    isSearching = true
-                }
+                isSearching = true
             }
         }
     }

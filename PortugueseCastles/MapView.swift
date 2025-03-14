@@ -6,6 +6,7 @@ struct MapView: UIViewRepresentable {
     @Binding var selectedCastle: Castle?
     @Binding var showInfoSheet: Bool
     @Binding var shouldResetMapView: Bool
+    @Binding var centerOnUserLocation: Bool
     let portugalRegion: MKCoordinateRegion
     
     func makeUIView(context: Context) -> MKMapView {
@@ -13,6 +14,10 @@ struct MapView: UIViewRepresentable {
         mapView.delegate = context.coordinator
         mapView.region = portugalRegion
         mapView.showsCompass = true
+        
+        // Enable showing user location
+        mapView.showsUserLocation = true
+        
         mapView.register(
             CastleAnnotationView.self,
             forAnnotationViewWithReuseIdentifier: CastleAnnotationView.reuseIdentifier
@@ -52,6 +57,20 @@ struct MapView: UIViewRepresentable {
             // Clear previous state
             context.coordinator.previousSelectedCastle = nil
             context.coordinator.previousMapRegion = nil
+        } else if centerOnUserLocation {
+            // Center on user location when requested
+            if let userLocation = mapView.userLocation.location {
+                let region = MKCoordinateRegion(
+                    center: userLocation.coordinate,
+                    span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+                )
+                mapView.setRegion(region, animated: true)
+            }
+            
+            // Reset the flag
+            DispatchQueue.main.async {
+                centerOnUserLocation = false
+            }
         } else if let selectedCastle = selectedCastle {
             // Check if this is a new castle selection or the same one
             let isNewSelection = context.coordinator.previousSelectedCastle == nil || 

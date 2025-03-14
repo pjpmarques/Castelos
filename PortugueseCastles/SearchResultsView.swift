@@ -19,21 +19,6 @@ struct SearchResultsView: View {
                     .padding()
                     .listRowBackground(Color.clear)
             } else {
-                // Header for results
-                if searchText.isEmpty {
-                    Text("Castles starting with 'A'")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .padding(.vertical, 4)
-                        .listRowBackground(Color.clear)
-                } else {
-                    Text("Search results for '\(searchText)'")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .padding(.vertical, 4)
-                        .listRowBackground(Color.clear)
-                }
-                
                 // Castle results
                 ForEach(filteredCastles) { castle in
                     Button(action: {
@@ -46,9 +31,8 @@ struct SearchResultsView: View {
                         // Then set the selected castle with a slight delay to ensure UI updates properly
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                             selectedCastle = castle
-                            withAnimation {
-                                isSearching = false
-                            }
+                            // Removed animation for instant disappearance
+                            isSearching = false
                         }
                     }) {
                         HStack {

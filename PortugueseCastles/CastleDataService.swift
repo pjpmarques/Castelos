@@ -148,19 +148,14 @@ class CastleDataService: ObservableObject {
         let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
         
         if trimmedQuery.isEmpty {
-            // When no search query is provided, return castles that start with 'A'
-            // or the first 20 castles to avoid having an empty list
-            let castlesStartingWithA = castles.filter { 
-                $0.name.prefix(1).lowercased() == "a"
-            }
-            
-            return castlesStartingWithA.isEmpty ? Array(castles.prefix(20)) : castlesStartingWithA
+            // When no search query is provided, return all castles sorted alphabetically
+            return castles.sorted(by: { $0.name.lowercased() < $1.name.lowercased() })
         }
         
         // Safely filter castles based on search query
         return castles.filter { castle in
             guard let name = castle.name as String? else { return false }
             return name.lowercased().contains(trimmedQuery.lowercased())
-        }
+        }.sorted(by: { $0.name.lowercased() < $1.name.lowercased() }) // Sort results alphabetically
     }
 } 

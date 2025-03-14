@@ -1,5 +1,6 @@
 import SwiftUI
 import MapKit
+import CoreLocation
 
 struct ContentView: View {
     @StateObject private var dataService = CastleDataService()
@@ -12,12 +13,24 @@ struct ContentView: View {
     @State private var shouldResetMapView = false
     @State private var showFallbackSafari = false
     @State private var webViewErrorOccurred = false
+    @State private var centerOnUserLocation = false
+    @State private var locationManager = CLLocationManager()
+    
+    // Maximum number of castles to show in search results when no query is entered
+    private let maxInitialSearchResults = 15
     
     // Portugal's bounding box coordinates for resetting the map
     private let portugalRegion = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 39.5, longitude: -8.0),
         span: MKCoordinateSpan(latitudeDelta: 5.0, longitudeDelta: 5.0)
     )
+    
+    // Function to calculate dynamic height based on number of results
+    private func calculateSearchResultsHeight() -> CGFloat {
+        let resultsCount = dataService.searchCastles(query: searchText).count
+        let limitedResultsCount = searchText.isEmpty ? min(resultsCount, maxInitialSearchResults) : min(resultsCount, 10)
+        return min(300, CGFloat(limitedResultsCount * 44))
+    }
     
     var body: some View {
         ZStack(alignment: .top) {
@@ -26,6 +39,7 @@ struct ContentView: View {
                    selectedCastle: $selectedCastle, 
                    showInfoSheet: $showInfoSheet,
                    shouldResetMapView: $shouldResetMapView,
+                   centerOnUserLocation: $centerOnUserLocation,
                    portugalRegion: portugalRegion)
                 .edgesIgnoringSafeArea(.all)
                 .overlay(
@@ -46,19 +60,21 @@ struct ContentView: View {
                         SearchBar(searchText: $searchText, isSearching: $isSearching)
                             .padding(.top, 2)
                         
-                        if isSearching {
-                            // Search Results
-                            SearchResultsView(
-                                dataService: dataService,
-                                searchText: $searchText,
-                                selectedCastle: $selectedCastle,
-                                isSearching: $isSearching
-                            )
-                            .frame(height: min(300, CGFloat(min(dataService.searchCastles(query: searchText).count, 10) * 44 + 44)))
-                            .background(Color(.systemBackground))
-                            .cornerRadius(10)
-                            .padding(.horizontal)
-                            .transition(.move(edge: .top))
+                        // Display search results without animation
+                        Group {
+                            if isSearching {
+                                // Search Results
+                                SearchResultsView(
+                                    dataService: dataService,
+                                    searchText: $searchText,
+                                    selectedCastle: $selectedCastle,
+                                    isSearching: $isSearching
+                                )
+                                .frame(height: calculateSearchResultsHeight())
+                                .background(Color(.systemBackground))
+                                .cornerRadius(10)
+                                .padding(.horizontal)
+                            }
                         }
                         
                         Spacer()
@@ -97,23 +113,45 @@ struct ContentView: View {
                 }
             }
             
-            // Visited Castles Button
+            // Bottom right buttons
             VStack {
                 Spacer()
                 
                 HStack {
                     Spacer()
                     
-                    Button(action: {
-                        showVisitedCastles = true
-                    }) {
-                        Image(systemName: "list.bullet.circle.fill")
-                            .font(.system(size: 24))
-                            .padding()
-                            .background(Color(.systemBackground))
-                            .foregroundColor(.blue)
-                            .clipShape(Circle())
-                            .shadow(radius: 3)
+                    VStack(spacing: 16) {
+                        // Location Button
+                        Button(action: {
+                            // Request location authorization if not determined
+                            if locationManager.authorizationStatus == .notDetermined {
+                                locationManager.requestWhenInUseAuthorization()
+                            }
+                            
+                            // Center on user location
+                            centerOnUserLocation = true
+                        }) {
+                            Image(systemName: "location.fill")
+                                .font(.system(size: 24))
+                                .padding()
+                                .background(Color(.systemBackground))
+                                .foregroundColor(.blue)
+                                .clipShape(Circle())
+                                .shadow(radius: 3)
+                        }
+                        
+                        // Visited Castles Button
+                        Button(action: {
+                            showVisitedCastles = true
+                        }) {
+                            Image(systemName: "list.bullet.circle.fill")
+                                .font(.system(size: 24))
+                                .padding()
+                                .background(Color(.systemBackground))
+                                .foregroundColor(.blue)
+                                .clipShape(Circle())
+                                .shadow(radius: 3)
+                        }
                     }
                     .padding(.trailing, 20)
                     .padding(.bottom, selectedCastle != nil ? 100 : 30)
@@ -173,6 +211,9 @@ struct ContentView: View {
                 object: nil,
                 userInfo: ["mapType": mapType.rawValue]
             )
+            
+            // Initialize the location manager
+            locationManager.desiredAccuracy = kCLLocationAccuracyBest
         }
         .onChange(of: mapType) { newValue in
             // Update map type when changed
