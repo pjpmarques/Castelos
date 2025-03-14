@@ -153,48 +153,51 @@ struct ContentView: View {
             
             // MARK: Floating Controls Layer
             
-            // Bottom right buttons for map actions
-            VStack {
-                Spacer()
-                
-                HStack {
+            // Only show floating controls when not searching
+            if !isSearching {
+                // Bottom right buttons for map actions
+                VStack {
                     Spacer()
                     
-                    VStack(spacing: 16) {
-                        // Location Button - Centers map on user location
-                        Button(action: {
-                            // Request location authorization if not determined
-                            if locationManager.authorizationStatus == .notDetermined {
-                                locationManager.requestWhenInUseAuthorization()
+                    HStack {
+                        Spacer()
+                        
+                        VStack(spacing: 16) {
+                            // Location Button - Centers map on user location
+                            Button(action: {
+                                // Request location authorization if not determined
+                                if locationManager.authorizationStatus == .notDetermined {
+                                    locationManager.requestWhenInUseAuthorization()
+                                }
+                                
+                                // Center on user location
+                                centerOnUserLocation = true
+                            }) {
+                                Image(systemName: "location.fill")
+                                    .font(.system(size: 24))
+                                    .padding()
+                                    .background(Color(.systemBackground))
+                                    .foregroundColor(.blue)
+                                    .clipShape(Circle())
+                                    .shadow(radius: 3)
                             }
                             
-                            // Center on user location
-                            centerOnUserLocation = true
-                        }) {
-                            Image(systemName: "location.fill")
-                                .font(.system(size: 24))
-                                .padding()
-                                .background(Color(.systemBackground))
-                                .foregroundColor(.blue)
-                                .clipShape(Circle())
-                                .shadow(radius: 3)
+                            // Visited Castles Button - Shows list of visited castles
+                            Button(action: {
+                                showVisitedCastles = true
+                            }) {
+                                Image(systemName: "list.bullet.circle.fill")
+                                    .font(.system(size: 24))
+                                    .padding()
+                                    .background(Color(.systemBackground))
+                                    .foregroundColor(.blue)
+                                    .clipShape(Circle())
+                                    .shadow(radius: 3)
+                            }
                         }
-                        
-                        // Visited Castles Button - Shows list of visited castles
-                        Button(action: {
-                            showVisitedCastles = true
-                        }) {
-                            Image(systemName: "list.bullet.circle.fill")
-                                .font(.system(size: 24))
-                                .padding()
-                                .background(Color(.systemBackground))
-                                .foregroundColor(.blue)
-                                .clipShape(Circle())
-                                .shadow(radius: 3)
-                        }
+                        .padding(.trailing, 20)
+                        .padding(.bottom, selectedCastle != nil ? 100 : 30)
                     }
-                    .padding(.trailing, 20)
-                    .padding(.bottom, selectedCastle != nil ? 100 : 30)
                 }
             }
         }
