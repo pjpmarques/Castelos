@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -18,6 +18,7 @@
 		1A1A1A221A1A1A1A1A1A1A22 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A2A2A322A2A2A2A2A2A2A32 /* ContentView.swift */; };
 		1A1A1A231A1A1A1A1A1A1A23 /* PortugueseCastlesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A2A2A332A2A2A2A2A2A2A33 /* PortugueseCastlesApp.swift */; };
 		1A1A1A241A1A1A1A1A1A1A24 /* portuguese_fortifications.csv in Resources */ = {isa = PBXBuildFile; fileRef = 2A2A2A342A2A2A2A2A2A2A34 /* portuguese_fortifications.csv */; };
+		1A1A1A251A1A1A1A1A1A1A25 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2A2A2A362A2A2A2A2A2A2A36 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +35,7 @@
 		2A2A2A332A2A2A2A2A2A2A33 /* PortugueseCastlesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortugueseCastlesApp.swift; sourceTree = "<group>"; };
 		2A2A2A342A2A2A2A2A2A2A34 /* portuguese_fortifications.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = portuguese_fortifications.csv; sourceTree = "<group>"; };
 		2A2A2A352A2A2A2A2A2A2A35 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		2A2A2A362A2A2A2A2A2A2A36 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +72,7 @@
 				2A2A2A312A2A2A2A2A2A2A31 /* SearchResultsView.swift */,
 				2A2A2A342A2A2A2A2A2A2A34 /* portuguese_fortifications.csv */,
 				2A2A2A352A2A2A2A2A2A2A35 /* Info.plist */,
+				2A2A2A362A2A2A2A2A2A2A36 /* Assets.xcassets */,
 			);
 			path = PortugueseCastles;
 			sourceTree = "<group>";
@@ -108,8 +111,9 @@
 		1A1A1A091A1A1A1A1A1A1A09 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 1240;
-				LastUpgradeCheck = 1240;
+				LastUpgradeCheck = 1620;
 				TargetAttributes = {
 					1A1A1A051A1A1A1A1A1A1A05 = {
 						CreatedOnToolsVersion = 12.4;
@@ -140,6 +144,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1A1A1A241A1A1A1A1A1A1A24 /* portuguese_fortifications.csv in Resources */,
+				1A1A1A251A1A1A1A1A1A1A25 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -203,6 +208,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -232,16 +238,21 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = 8UZPQQPXZW;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = PortugueseCastles/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Castles;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.reference";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.PortugueseCastles;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -254,16 +265,21 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = 8UZPQQPXZW;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = PortugueseCastles/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Castles;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.reference";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.PortugueseCastles;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
