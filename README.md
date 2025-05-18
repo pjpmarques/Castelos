@@ -99,4 +99,4 @@ Contributions to improve the app are welcome. Please feel free to submit pull re
 
 ## License
 
-This project is available as open source under the terms of the MIT License. 
+This project is available as open source under the terms of the Apache 2.0 License. 
