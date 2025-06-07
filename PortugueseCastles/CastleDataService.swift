@@ -179,14 +179,20 @@ class CastleDataService: ObservableObject {
      */
     func toggleVisitedStatus(for castle: Castle) {
         if let index = castles.firstIndex(where: { $0.name == castle.name }) {
+            objectWillChange.send()
+
             castles[index].isVisited.toggle()
-            
+
             if castles[index].isVisited {
                 visitedCastles.append(castles[index])
             } else {
                 visitedCastles.removeAll { $0.name == castle.name }
             }
-            
+
+            // Reassign arrays to trigger @Published updates
+            castles = castles
+            visitedCastles = visitedCastles
+
             saveVisitedCastlesToUserDefaults()
         }
     }
